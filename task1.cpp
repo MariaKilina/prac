@@ -11,7 +11,7 @@ using namespace std;
 class vector
 {
     int N;
-    int ind;
+    unsigned long ind;
     complex <double> *v;
 
     public:
@@ -23,13 +23,21 @@ class vector
         v = new complex <double> [ind];
         double x, y;
         int i;
+        double sum = 0;
         srand (static_cast <unsigned> (time(0)));
-//        #pragma omp parallel for private (i, x, y) schedule(dynamic, ind / omp_get_num_threads())
+        #pragma omp parallel for private (i, x, y)
         for (i = 0; i < ind; ++i)
         {
             x = -10000 + static_cast <double> (rand() * 1. / (static_cast <double> (RAND_MAX * 1. /(20000))));
             y = -10000 + static_cast <double> (rand() * 1. / (static_cast <double> (RAND_MAX * 1. /(20000))));
             v[i] = complex <double> (x, y);
+            sum += pow(x, 2) + pow(y, 2);
+        }
+        sum = sqrt(sum);
+        #pragma omp parallel for private(i)
+        for (i = 0; i < ind; ++i)
+        {
+            v[i] = complex <double> (real(v[i])/sum, imag(v[i])/sum);
         }
     }
     ~vector()
@@ -80,7 +88,7 @@ int main(int argc, char **argv)
     int k = atoi(argv[3]);
 
     ofstream t, f;
-    t.open("ex_time.txt", ios::app);
+    t.open(argv[4], ios::app);
     f.open("vectors.txt", ios::trunc | ios::out);
 
     double *H;

@@ -1,7 +1,7 @@
-if (iter == 0) set output "time20.png"
-if (iter == 1) set output "time24.png"
-if (iter == 2) set output "time28.png"
-if (iter == 3) set output "time36.png"
-plot "ex_time.txt" index iter u 2:3 w linespoints
+if (iter == 0) set output "time20_7.png"
+if (iter == 1) set output "time24_7.png"
+if (iter == 2) set output "time28_7.png"
+if (iter == 3) set output "time30_7.png"
+plot "ex_time7.txt" index iter u 2:3 w linespoints
 iter = iter + 1
 if (iter < 4) reread

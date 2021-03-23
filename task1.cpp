@@ -25,7 +25,7 @@ class vector
         int i;
         double sum = 0;
         srand (static_cast <unsigned> (time(0)));
-        #pragma omp parallel for private (i, x, y)
+//        #pragma omp parallel for private (i, x, y)
         for (i = 0; i < ind; ++i)
         {
             x = -10000 + static_cast <double> (rand() * 1. / (static_cast <double> (RAND_MAX * 1. /(20000))));

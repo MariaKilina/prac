@@ -21,18 +21,24 @@ class vector
         N = n;
         ind = pow(2, N);
         v = new complex <double> [ind];
+    }
+    void initialize()
+    {
         double x, y;
         int i;
-        double sum = 0;
-        srand (static_cast <unsigned> (time(0)));
-//        #pragma omp parallel for private (i, x, y)
-        for (i = 0; i < ind; ++i)
-        {
-            x = -10000 + static_cast <double> (rand() * 1. / (static_cast <double> (RAND_MAX * 1. /(20000))));
-            y = -10000 + static_cast <double> (rand() * 1. / (static_cast <double> (RAND_MAX * 1. /(20000))));
-            v[i] = complex <double> (x, y);
-            sum += pow(x, 2) + pow(y, 2);
-        }
+        long double sum = 0; 
+//    	#pragma omp parallel
+//    	{
+    	    srand(omp_get_thread_num() * 1000);
+//    	    #pragma omp for private (i, x, y) reduction (+:sum)
+    	    for (i = 0; i < ind; ++i)
+    	    {
+        	x = -10000. + (double)rand() / RAND_MAX * 20000.;
+        	y = -10000. + (double)rand() / RAND_MAX * 20000.;
+        	v[i] = complex <double> (x, y);
+        	sum += pow(x, 2) + pow(y, 2);
+    	    }
+//	}
         sum = sqrt(sum);
         #pragma omp parallel for private(i)
         for (i = 0; i < ind; ++i)
@@ -64,7 +70,7 @@ void vector::converting(const vector &b, int k, double *H)
     int i;
     int ik;
     unsigned int mask = (int) pow(2, N - k);
-    #pragma omp parallel for private (i, ik) schedule (dynamic, ind / omp_get_num_threads())
+    #pragma omp parallel for private (i, ik)
     for (i = 0; i < ind; ++i)
     {
         ik = (i / (int) pow(2, N - k)) % 2; 
@@ -98,10 +104,11 @@ int main(int argc, char **argv)
 
     double start, stop, ex_time;
 
-    start = omp_get_wtime();
+//    start = omp_get_wtime();
 
     vector a(n), b(n);
-
+    a.initialize();
+    start = omp_get_wtime();
     a.converting(b, k, H);
 
     stop = omp_get_wtime();
